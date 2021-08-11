@@ -1,6 +1,7 @@
 package com.nectar.failurelogsys.db.repository;
 import com.nectar.failurelogsys.db.model.ErrorLog;
 import com.nectar.failurelogsys.db.model.HistoryData;
+import com.nectar.failurelogsys.db.model.AggregationData;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -49,20 +50,38 @@ public class HistoryRepository{
 		// System.out.println("generated EmployeeId = " + generatedEmployeeId);
 	}
     
-	public void insert2(ErrorLog errorLog){
-		String sql2 = "INSERT INTO scheduler_failure_logs " + "(date,scheduler_name,type_of_failure,description) VALUES (?,?,?,?)";
+	public void insertToErrorLog(ErrorLog errorLog){
+		String sql = "INSERT INTO scheduler_failure_logs " + "(date,scheduler_name,type_of_failure,description) VALUES (?,?,?,?)";
 		jdbcTemplateTwo.update(new PreparedStatementCreator()
 		{
 			@Override
 			public PreparedStatement createPreparedStatement(Connection connection)
 					throws SQLException
 			{
-				PreparedStatement ps = connection.prepareStatement(sql2,
+				PreparedStatement ps = connection.prepareStatement(sql,
 						Statement.RETURN_GENERATED_KEYS);
 				ps.setString(1, errorLog.getDate());
 				ps.setString(2, errorLog.getScheduler_name());
 				ps.setString(3, errorLog.getType_of_failure());
 				ps.setString(4, errorLog.getDescription());
+				return ps;
+			}
+		});
+	}
+
+	public void insertToAggregation(AggregationData aggregationData ){
+		String sql = "INSERT INTO aggregationdata " + "(name,datetime,consumption) VALUES (?,?,?)";
+		jdbcTemplateTwo.update(new PreparedStatementCreator()
+		{
+			@Override
+			public PreparedStatement createPreparedStatement(Connection connection)
+					throws SQLException
+			{
+				PreparedStatement ps = connection.prepareStatement(sql,
+						Statement.RETURN_GENERATED_KEYS);
+				ps.setString(1, aggregationData.getName());
+				ps.setString(2, aggregationData.getDatetime());
+				ps.setString(3, aggregationData.getConsumption());
 				return ps;
 			}
 		});

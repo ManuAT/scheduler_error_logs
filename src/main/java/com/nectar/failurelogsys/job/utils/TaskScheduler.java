@@ -23,6 +23,7 @@ import org.quartz.Trigger;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +41,7 @@ public class TaskScheduler {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TaskScheduler.class);
 	Properties props = new Properties();
 
+	@Autowired
 	private  Scheduler scheduler;
 
 	public void deleteScheduledTask(String jobName, String group) {

@@ -1,10 +1,16 @@
 package com.nectar.failurelogsys;
 
 
+import java.util.HashMap;
+
+import com.nectar.failurelogsys.db.model.AggregationData;
 import com.nectar.failurelogsys.db.model.ErrorLog;
 import com.nectar.failurelogsys.db.model.HistoryData;
 import com.nectar.failurelogsys.db.repository.HistoryRepository;
+import com.nectar.failurelogsys.job.utils.TaskScheduler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -13,8 +19,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class FailurelogsysApplication implements CommandLineRunner{
 
+	private static final Logger LOGGER = LoggerFactory.getLogger("FailurelogsysApplication");
+	private static final String AGGREGRATION_JOB = "findConsumption";
+	private static final String EVERY_HOUR = " 0/5 * * * * ? *";
+
 	@Autowired
 	private HistoryRepository historyRepository;
+
+	@Autowired
+	TaskScheduler taskScheduler;
 
 
 
@@ -26,13 +39,31 @@ public class FailurelogsysApplication implements CommandLineRunner{
 
 	@Override
 	public void run(String... args) throws Exception {
-		System.out.println("inside run ....");
-		HistoryData historyData = new HistoryData("Equp2","hello", "11001");
-		historyRepository.insert(historyData);
 
-		ErrorLog errorLog = new ErrorLog("Equp2","hello", "11001", "hello");
-		historyRepository.insert2(errorLog);
-		System.out.println("History record inserted successfully in first database");
+		// =========== testing Database insertion ==========
+
+		// System.out.println("inside run ....");
+		// HistoryData historyData = new HistoryData("Equp2","hello", "11001");
+		// historyRepository.insert(historyData);
+
+		// ErrorLog errorLog = new ErrorLog("Equp2","hello", "11001", "hello");
+		// historyRepository.insertToErrorLog(errorLog);
+
+		// AggregationData aggregationData = new AggregationData("Equp2","hello", "11001");
+		// historyRepository.insertToAggregation(aggregationData);
+
+		// System.out.println("History record inserted successfully in first database");
+
+
+		// ============ job creation and delete =================
+
+		// HashMap<String, Object> data = new HashMap<String, Object>();
+		// data.put("domain", "nectar");
+		// taskScheduler.createCroneJob(AGGREGRATION_JOB, AGGREGRATION_JOB, data, EVERY_HOUR,
+		// 			jobTest.class);
+		
+		// taskScheduler.deleteScheduledTask(AGGREGRATION_JOB, AGGREGRATION_JOB);
+		
 	}
 
 	
