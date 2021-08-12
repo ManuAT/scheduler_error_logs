@@ -9,6 +9,9 @@ import com.nectar.failurelogsys.db.model.HistoryData;
 import com.nectar.failurelogsys.db.repository.HistoryRepository;
 import com.nectar.failurelogsys.job.utils.TaskScheduler;
 
+import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
+import org.joda.time.LocalTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +57,17 @@ public class FailurelogsysApplication implements CommandLineRunner{
 
 		// System.out.println("History record inserted successfully in first database");
 
-
+		// =============================
+		String startTime,endTime;
+		LocalDateTime localDate = new LocalDateTime();
+		localDate = localDate.minusHours(1);
+		int currentHour = localDate.getHourOfDay();
+		localDate = localDate.millisOfDay().withMinimumValue();
+		startTime = localDate.plusHours(currentHour).toString();
+		endTime = localDate.plusHours(currentHour+1).toString();
+		System.out.println("StartTime :"+startTime+"EndTime :"+endTime);
+		System.out.println( historyRepository.selectFromHistoryData(startTime, endTime));
+		// System.out.println( historyRepository.selectFromHistoryData("2021-08-12 07:06:51", "2021-08-12 08:06:51"));
 		// ============ job creation and delete =================
 
 		// HashMap<String, Object> data = new HashMap<String, Object>();

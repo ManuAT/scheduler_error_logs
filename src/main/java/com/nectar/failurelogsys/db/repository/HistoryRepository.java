@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,6 +15,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 // import org.springframework.jdbc.support.GeneratedKeyHolder;
 // import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+
 
 
 
@@ -85,6 +87,20 @@ public class HistoryRepository{
 				return ps;
 			}
 		});
+	}
+
+	public List<HistoryData> selectFromHistoryData(String startDate, String endDate){
+		// SELECT  * FROM    public.historydata WHERE   datetime >= '2013-01-03' AND datetime   <= '2013-01-09'
+		String sql = "SELECT * FROM historydata " +"WHERE  datetime >= '"+startDate+"' AND datetime < '"+endDate+"'";
+		try{
+		List<HistoryData> result = jdbcTemplateTwo.query(sql,new HistoryDataMapper());
+		return result;
+		}catch(Exception e){
+		System.out.println(e+ "Error Ocoured on sql query");
+		return null;
+		}
+		
+
 	}
 
 
