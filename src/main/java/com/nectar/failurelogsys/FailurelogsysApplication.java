@@ -70,10 +70,10 @@ public class FailurelogsysApplication implements CommandLineRunner{
 		// System.out.println( historyRepository.selectFromHistoryData("2021-08-12 07:06:51", "2021-08-12 08:06:51"));
 		// ============ job creation and delete =================
 
-		HashMap<String, Object> data = new HashMap<String, Object>();
-		data.put("domain", "nectar");
-		taskScheduler.createCroneJob(AGGREGRATION_JOB, AGGREGRATION_JOB, data, EVERY_HOUR,
-					jobTest.class);
+		// HashMap<String, Object> data = new HashMap<String, Object>();
+		// data.put("domain", "nectar");
+		// taskScheduler.createCroneJob(AGGREGRATION_JOB, AGGREGRATION_JOB, data, EVERY_HOUR,
+		// 			jobTest.class);
 		
 		// taskScheduler.deleteScheduledTask(AGGREGRATION_JOB, AGGREGRATION_JOB);
 		
