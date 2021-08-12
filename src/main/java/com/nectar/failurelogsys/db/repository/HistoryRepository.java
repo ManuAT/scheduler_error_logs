@@ -100,8 +100,22 @@ public class HistoryRepository{
 		return null;
 		}
 		
-
 	}
+
+	public AggregationData selectFromAggregationData(String startDate, String equipmentName){
+
+		String sql = "SELECT * FROM aggregationdata " +"WHERE  datetime = '"+startDate+"' AND name = '"+equipmentName+"'";
+		try{
+		AggregationData result = jdbcTemplateTwo.queryForObject(sql,AggregationData.class);
+		return result;
+		}catch(Exception e){
+		System.out.println(e+ "Error Ocoured on sql query");
+		return null;
+		}
+		
+	}
+
+	
 
 
     

@@ -3,6 +3,7 @@ package com.nectar.failurelogsys;
 import java.util.List;
 
 import com.nectar.failurelogsys.db.model.AggregationData;
+import com.nectar.failurelogsys.db.model.ErrorLog;
 import com.nectar.failurelogsys.db.model.HistoryData;
 import com.nectar.failurelogsys.db.repository.HistoryRepository;
 
@@ -67,20 +68,42 @@ public class jobTest extends QuartzJobBean{
 
                 if(count>1){
                     int aggregationDataFromHistory = maxValue-minValue;
-                    
-                    AggregationData aggregationData = new AggregationData(equpmetList[i],startTime,Integer.toString(aggregationDataFromHistory));
-                    historyRepository.insertToAggregation(aggregationData);
-                    System.out.println("Aggregation Database updated");
-                }
-                else if(count==1){
-                        System.out.println("Equipment :"+equpmetList[i]+"might lost Conection");
+
+                    AggregationData aggregationDataFromdb = historyRepository.selectFromAggregationData(startTime, equpmetList[0]);
+
+                    if(aggregationDataFromHistory < 5*Integer.parseInt(aggregationDataFromdb.getConsumption()) || Integer.parseInt(aggregationDataFromdb.getConsumption()) ==0 )
+                    {
+                        AggregationData aggregationData = new AggregationData(equpmetList[i],startTime,Integer.toString(aggregationDataFromHistory));
+                        historyRepository.insertToAggregation(aggregationData);
+                        System.out.println("Aggregation Database updated");
+                    }
+                    else
+                    {
                         AggregationData aggregationData = new AggregationData(equpmetList[i],startTime,"0");
                         historyRepository.insertToAggregation(aggregationData);
+                        System.out.println("Aggregation Database updated with spike");
+
+                    }
+                }
+                else if(count==1){
+                        AggregationData aggregationData = new AggregationData(equpmetList[i],startTime,"0");
+                        historyRepository.insertToAggregation(aggregationData);
+                        System.out.println("Equipment :"+equpmetList[i]+"might lost Conection and databse updated");
+
                 }else{
-                    System.out.println("Equipment :"+equpmetList[i]+" failed");
                     AggregationData aggregationData = new AggregationData(equpmetList[i],startTime,"0");
                     historyRepository.insertToAggregation(aggregationData);
+                    System.out.println("Equipment :"+equpmetList[i]+" failed and aggregation database updated");
+
+                    ErrorLog errorLog = new ErrorLog(new LocalDateTime().toString(),id,"data not recived","equpment faild");
+                    historyRepository.insertToErrorLog(errorLog);
+                    System.out.println("Equipment :"+equpmetList[i]+" failed and err_databse database updated");
+
+
+
                 }
+
+
 
             }
 
