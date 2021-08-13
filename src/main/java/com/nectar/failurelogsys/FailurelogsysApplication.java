@@ -69,12 +69,13 @@ public class FailurelogsysApplication implements CommandLineRunner{
 		// System.out.println("StartTime :"+startTime+"EndTime :"+endTime);
 		// System.out.println( historyRepository.selectFromHistoryData(startTime, endTime));
 		// System.out.println( historyRepository.selectFromHistoryData("2021-08-12 07:06:51", "2021-08-12 08:06:51"));
+
 		// ============ job creation and delete =================
 
-		// HashMap<String, Object> data = new HashMap<String, Object>();
-		// data.put("domain", "nectar");
-		// taskScheduler.createCroneJob(AGGREGRATION_JOB, AGGREGRATION_JOB, data, EVERY_HOUR,
-		// 			jobTest.class);
+		HashMap<String, Object> data = new HashMap<String, Object>();
+		data.put("domain", "nectar");
+		taskScheduler.createCroneJob(AGGREGRATION_JOB, AGGREGRATION_JOB, data, EVERY_HOUR,
+					jobObject.class);
 		
 		// taskScheduler.deleteScheduledTask(AGGREGRATION_JOB, AGGREGRATION_JOB);
 
@@ -102,7 +103,7 @@ public class FailurelogsysApplication implements CommandLineRunner{
 
 	// 		case 1:
 	// 			taskScheduler.createCroneJob(AGGREGRATION_JOB, AGGREGRATION_JOB, data, EVERY_HOUR,
-	// 			jobTest.class);
+	// 			jobObject.class);
 	// 			break;
 	
 	// 		case 2:

@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class jobTest extends QuartzJobBean{
+public class jobObject extends QuartzJobBean{
 
     private EquipmentNotificationMessage notificationMessage;
 
@@ -32,7 +32,7 @@ public class jobTest extends QuartzJobBean{
 	private HistoryRepository historyRepository;
 
     private static String schedulerName;
-    private static final Logger log = LoggerFactory.getLogger("jobTest");
+    private static final Logger log = LoggerFactory.getLogger("jobObject");
     
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
