@@ -1,0 +1,5 @@
+Equip 1
+Equip 2
+Equip 3
+Equip 4
+Equip 5

@@ -21,11 +21,11 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public class HistoryRepository{
+public class HistoryRepository {
     @Autowired 
     private JdbcTemplate jdbcTemplateTwo;
     
-    public void insert(HistoryData historyData)
+    public void insert(HistoryData historyData) 
 	{
 		String sql = "INSERT INTO HistoryData " + "(name,datetime,data) VALUES (?,?,?)";
 
@@ -89,14 +89,14 @@ public class HistoryRepository{
 		});
 	}
 
-	public List<HistoryData> selectFromHistoryData(String startDate, String endDate){
+	public List<HistoryData> selectFromHistoryData(String startDate, String endDate) {
 		// SELECT  * FROM    public.historydata WHERE   datetime >= '2013-01-03' AND datetime   <= '2013-01-09'
 		String sql = "SELECT * FROM historydata " +"WHERE  datetime >= '"+startDate+"' AND datetime < '"+endDate+"'";
 		try{
 		List<HistoryData> result = jdbcTemplateTwo.query(sql,new HistoryDataMapper());
 		return result;
 		}catch(Exception e){
-		System.out.println(e+ "Error Ocoured on sql query");
+		System.out.println( "Error Ocoured on sql query listing from History database "+e.getMessage());
 		return null;
 		}
 		
@@ -109,8 +109,10 @@ public class HistoryRepository{
 		AggregationData result = jdbcTemplateTwo.queryForObject(sql,AggregationData.class);
 		return result;
 		}catch(Exception e){
-		System.out.println(e+ "Error Ocoured on sql query");
-		return null;
+		System.out.println("Error Ocoured on sql query on Aggregation database"+e.getMessage());
+		AggregationData result = new AggregationData();
+		result.setConsumption("0");
+		return result;
 		}
 		
 	}

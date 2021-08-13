@@ -2,6 +2,7 @@ package com.nectar.failurelogsys;
 
 
 import java.util.HashMap;
+import java.util.Scanner;
 
 import com.nectar.failurelogsys.db.model.AggregationData;
 import com.nectar.failurelogsys.db.model.ErrorLog;
@@ -24,7 +25,7 @@ public class FailurelogsysApplication implements CommandLineRunner{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger("FailurelogsysApplication");
 	private static final String AGGREGRATION_JOB = "findConsumption";
-	private static final String EVERY_HOUR = " 0/5 * * * * ? *";
+	private static final String EVERY_HOUR = " 0/10 * * * * ? *";
 
 	@Autowired
 	private HistoryRepository historyRepository;
@@ -76,10 +77,48 @@ public class FailurelogsysApplication implements CommandLineRunner{
 		// 			jobTest.class);
 		
 		// taskScheduler.deleteScheduledTask(AGGREGRATION_JOB, AGGREGRATION_JOB);
+
+		// =============== UI setup ==============
+
+	// 	Scanner sc = new Scanner(System.in);
+
+	// 	System.out.println("Enter option");
+	// 	System.out.println("1.Create Weather Prediction Job");
+	// 	System.out.println("2.Delete Weather Prediction Job");
 		
-	}
+	// 	String optionStr = sc.next();
+	// 	int option = Integer.parseInt(optionStr);
+
+	// 	HashMap<String, Object> data = new HashMap<String, Object>();
+
+	// 	String domain = null;
+	// 	if (option == 1 || option == 3) {
+	// 		System.out.println("Enter domain");
+	// 		domain = sc.next();
+	// 		data.put("domain", domain);
+	// 	}
+
+	// 	switch (option) {
+
+	// 		case 1:
+	// 			taskScheduler.createCroneJob(AGGREGRATION_JOB, AGGREGRATION_JOB, data, EVERY_HOUR,
+	// 			jobTest.class);
+	// 			break;
+	
+	// 		case 2:
+	// 			taskScheduler.deleteScheduledTask(AGGREGRATION_JOB, AGGREGRATION_JOB);
+	// 			break;
+	// 		default:
+	// 			break;
+	// 		}
+
+
+	// 		sc.close();
+	// 		System.exit(0);
+		
+	// }
 
 	
-
+	}
 
 }
