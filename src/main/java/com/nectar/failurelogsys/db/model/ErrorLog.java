@@ -1,27 +1,53 @@
 package com.nectar.failurelogsys.db.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
+@Entity
 @Table(name = "scheduler_failure_logs")
 public class ErrorLog {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+
+    @Column(name = "id")
+    private Long id;
+
+    @Column(name = "date")
     private String date;
-    private String scheduler_name;
-    private String type_of_failure;
+
+    @Column(name = "scheduler_name")
+    private String schedulerName;
+
+    @Column(name = "type_of_failure")
+    private String typeOfFailure;
+
+    @Column(name = "description")
     private String description;
+
+    public ErrorLog(String date, String schedulerName, String typeOfFailure, String description) {
+        super();
+        this.date = date;
+        this.schedulerName = schedulerName;
+        this.typeOfFailure = typeOfFailure;
+        this.description = description;
+    }
 
     public ErrorLog() {
         super();
     }
 
-    public ErrorLog(String date, String scheduler_name, String type_of_failure, String description) {
-        super();
-        this.date = date;
-        this.scheduler_name = scheduler_name;
-        this.type_of_failure = type_of_failure;
-        this.description = description;
+    public Long getId() {
+        return id;
     }
 
-    
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getDate() {
         return date;
     }
@@ -30,20 +56,20 @@ public class ErrorLog {
         this.date = date;
     }
 
-    public String getScheduler_name() {
-        return scheduler_name;
+    public String getSchedulerName() {
+        return schedulerName;
     }
 
-    public void setScheduler_name(String scheduler_name) {
-        this.scheduler_name = scheduler_name;
+    public void setSchedulerName(String schedulerName) {
+        this.schedulerName = schedulerName;
     }
 
-    public String getType_of_failure() {
-        return type_of_failure;
+    public String getTypeOfFailure() {
+        return typeOfFailure;
     }
 
-    public void setType_of_failure(String type_of_failure) {
-        this.type_of_failure = type_of_failure;
+    public void setTypeOfFailure(String typeOfFailure) {
+        this.typeOfFailure = typeOfFailure;
     }
 
     public String getDescription() {
@@ -53,8 +79,6 @@ public class ErrorLog {
     public void setDescription(String description) {
         this.description = description;
     }
-
-    
 
     
 }

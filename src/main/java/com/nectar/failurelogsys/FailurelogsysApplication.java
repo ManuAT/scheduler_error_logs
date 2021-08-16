@@ -7,7 +7,7 @@ import java.util.Scanner;
 import com.nectar.failurelogsys.db.model.AggregationData;
 import com.nectar.failurelogsys.db.model.ErrorLog;
 import com.nectar.failurelogsys.db.model.HistoryData;
-import com.nectar.failurelogsys.db.repository.HistoryRepository;
+// import com.nectar.failurelogsys.db.repository.HistoryRepository;
 import com.nectar.failurelogsys.job.utils.TaskScheduler;
 
 import org.joda.time.DateTime;
@@ -27,8 +27,8 @@ public class FailurelogsysApplication implements CommandLineRunner{
 	private static final String AGGREGRATION_JOB = "findConsumption";
 	private static final String EVERY_HOUR = " 0/10 * * * * ? *";
 
-	@Autowired
-	private HistoryRepository historyRepository;
+	// @Autowired
+	// private HistoryRepository historyRepository;
 
 	@Autowired
 	TaskScheduler taskScheduler;

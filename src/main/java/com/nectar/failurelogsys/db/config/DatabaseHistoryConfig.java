@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 
 
 
@@ -55,6 +57,8 @@ public class DatabaseHistoryConfig   {
 	{
 		return new JdbcTemplate(ds);
 	}
+
+	
 
 
 }
