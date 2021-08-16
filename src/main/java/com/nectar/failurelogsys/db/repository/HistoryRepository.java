@@ -9,6 +9,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -24,6 +26,8 @@ import org.springframework.stereotype.Repository;
 public class HistoryRepository {
     @Autowired 
     private JdbcTemplate jdbcTemplateTwo;
+
+	private static final Logger log = LoggerFactory.getLogger("jobObject");
     
     public void insert(HistoryData historyData) 
 	{
@@ -96,7 +100,7 @@ public class HistoryRepository {
 		List<HistoryData> result = jdbcTemplateTwo.query(sql,new HistoryDataMapper());
 		return result;
 		}catch(Exception e){
-		System.out.println( "Error Ocoured on sql query listing from History database "+e.getMessage());
+		log.error( "Error Ocoured on sql query listing from History database "+e.getMessage());
 		return null;
 		}
 		
@@ -109,7 +113,7 @@ public class HistoryRepository {
 		AggregationData result = jdbcTemplateTwo.queryForObject(sql,AggregationData.class);
 		return result;
 		}catch(Exception e){
-		System.out.println("Error Ocoured on sql query on Aggregation database"+e.getMessage());
+		log.error("Error Ocoured on sql query on Aggregation database"+e.getMessage());
 		AggregationData result = new AggregationData();
 		result.setConsumption("0");
 		return result;
