@@ -13,7 +13,6 @@ import com.nectar.failurelogsys.db.model.HistoryData;
 import com.nectar.failurelogsys.db.repository.AggregationDataRepository;
 import com.nectar.failurelogsys.db.repository.ErrorLogRepository;
 import com.nectar.failurelogsys.db.repository.HistoryDataRepository;
-// import com.nectar.failurelogsys.db.repository.HistoryRepository;
 import com.nectar.failurelogsys.service.EquipmentNotificationMessage;
 
 import org.joda.time.DateTime;
@@ -46,6 +45,7 @@ public class jobObject extends QuartzJobBean{
 	// private HistoryRepository historyRepository;
 
     private static String schedulerName;
+    private static String equipmentName;
     private static final Logger log = LoggerFactory.getLogger("jobObject");
     
     @Override
@@ -81,9 +81,7 @@ public class jobObject extends QuartzJobBean{
               
                 while (sc.hasNextLine())
                   equipmentList.add(sc.nextLine());
-            
-                // for(String data:equipmentList)
-                //   log.info(data);
+
                 sc.close();
                 }catch(Exception e){
                   log.warn(e.toString());
@@ -94,47 +92,56 @@ public class jobObject extends QuartzJobBean{
             // System.out.println(historyDataList);
 
             for(String equipmentName:equipmentList){
+                jobObject.equipmentName =equipmentName;
                 int count = 0;
-                // int maxValue=0;
-                // int minValue=0;
-                HistoryData maxValue;
-                HistoryData minValue;
+                int maxValue=0;
+                int minValue=0;
+                // HistoryData maxValue = new HistoryData();
+                // maxValue.setData("0");
+                // HistoryData minValue = new HistoryData();
+                // minValue.setData("0");
 
                 
-                // for(HistoryData data:historyDataList) {
-                //     // System.out.println(data.getName()+equpmetList[i]);
-                //     if(data.getName().equals(equipmentName)){
-                //         count ++;
-                //         if(count == 1){
-                //             minValue = Integer.parseInt(data.getData());
-                //             maxValue = Integer.parseInt(data.getData());
-                //         }
-                //         else{
-                //             maxValue = Integer.parseInt(data.getData());
-                //         }
-                //     }
-                // }
+                for(HistoryData data:historyDataList) {
+                    // System.out.println(data.getName()+equpmetList[i]);
+                    if(data.getName().equals(equipmentName)){
+                        count ++;
+                        if(count == 1){
+                            minValue = Integer.parseInt(data.getData());
+                            maxValue = Integer.parseInt(data.getData());
+                        }
+                        else{
+                            maxValue = Integer.parseInt(data.getData());
+                        }
+                    }
+                }
 
                 // need to be checked
 
-                maxValue = historyDataList.stream().max(Comparator.comparing(HistoryData::getData)).orElse(new HistoryData());
-                minValue = historyDataList.stream().min(Comparator.comparing(HistoryData::getData)).orElse(new HistoryData());
+                // maxValue = historyDataList.stream().max(Comparator.comparing(HistoryData::getData)).orElse(new HistoryData());
+                // minValue = historyDataList.stream().min(Comparator.comparing(HistoryData::getData)).orElse(new HistoryData());
 
-                System.out.println("Printing Max value"+maxValue.getData());
 
-                if(maxValue.getData() == null || minValue.getData() ==null){
-                    maxValue.setData("0");
-                    minValue.setData("0");
-                }
+                // if(maxValue.getData() == null || minValue.getData() ==null){
+                //     maxValue.setData("0");
+                //     minValue.setData("0");
+                // }
+
+                // System.out.println("Printing Max value"+maxValue.getData()+minValue.getData());
+                System.out.println("Printing Max value"+maxValue+" "+minValue);
                     
                 if(count>1){
-                    int aggregationDataFromHistory =Integer.parseInt(maxValue.getData())- Integer.parseInt(minValue.getData());
-                    // int aggregationDataFromHistory = maxValue = minValue;
+                    // int aggregationDataFromHistory =Integer.parseInt(maxValue.getData())- Integer.parseInt(minValue.getData());
+                    int aggregationDataFromHistory = maxValue = minValue;
 
 
 
-                    AggregationData aggregationDataFromdb = (AggregationData) aggregationDataRepository.selectFromAggregationData(previousStartTime, equipmentName);//[0]
-                    
+                    AggregationData aggregationDataFromdb = aggregationDataRepository.selectFromAggregationData(previousStartTime, equipmentName);//[0]
+                    if (aggregationDataFromdb == null){
+                        aggregationDataFromdb = new AggregationData();
+                        aggregationDataFromdb.setConsumption("0");
+                    }
+                        
                     if(aggregationDataFromHistory < 5*Integer.parseInt(aggregationDataFromdb.getConsumption()) || Integer.parseInt(aggregationDataFromdb.getConsumption()) ==0 )
                     {
                         AggregationData aggregationData = new AggregationData(equipmentName,startTime,Integer.toString(aggregationDataFromHistory));
@@ -148,7 +155,7 @@ public class jobObject extends QuartzJobBean{
                         aggregationDataRepository.save(aggregationData);
                         log.warn("Aggregation Database updated with spike");
 
-                        ErrorLog errorLog = new ErrorLog(new DateTime().toString(),id,notificationMessage.SPIKE.getMessage(),notificationMessage.SPIKE.getDescription());
+                        ErrorLog errorLog = new ErrorLog(new DateTime().toString(),id,notificationMessage.SPIKE.getMessage(),notificationMessage.SPIKE.getDescription(),equipmentName);
                         errorLogRepository.save(errorLog);
                         log.warn("Equipment :"+equipmentName+" failed and err_databse database updated");
 
@@ -160,7 +167,7 @@ public class jobObject extends QuartzJobBean{
                         aggregationDataRepository.save(aggregationData);
                         log.warn("Equipment :"+equipmentName+"might lost Conection and databse updated");
 
-                        ErrorLog errorLog = new ErrorLog(new DateTime().toString(),id,notificationMessage.NON_CUMULATIVE.getMessage(),notificationMessage.NON_CUMULATIVE.getDescription());
+                        ErrorLog errorLog = new ErrorLog(new DateTime().toString(),id,notificationMessage.NON_CUMULATIVE.getMessage(),notificationMessage.NON_CUMULATIVE.getDescription(),equipmentName);
                         errorLogRepository.save(errorLog);
                         log.warn("Equipment :"+equipmentName+" failed and err_databse database updated");
 
@@ -169,7 +176,7 @@ public class jobObject extends QuartzJobBean{
                     aggregationDataRepository.save(aggregationData);
                     log.warn("Equipment :"+equipmentName+" failed and aggregation database updated");
 
-                    ErrorLog errorLog = new ErrorLog(new DateTime().toString(),id,notificationMessage.NO_COMMUNICATION.getMessage(),notificationMessage.NO_COMMUNICATION.getDescription());
+                    ErrorLog errorLog = new ErrorLog(new DateTime().toString(),id,notificationMessage.NO_COMMUNICATION.getMessage(),notificationMessage.NO_COMMUNICATION.getDescription(),equipmentName);
                     errorLogRepository.save(errorLog);
                     log.warn("Equipment :"+equipmentName+" failed and err_databse database updated");
 
@@ -180,7 +187,7 @@ public class jobObject extends QuartzJobBean{
         } catch (Exception e) {
 
             log.error("Error occured at scheduler and reporting :"+e.getMessage());
-            ErrorLog errorLog = new ErrorLog(new DateTime().toString(),schedulerName,notificationMessage.SCHEDULER_ERROR.getMessage(),e.getMessage());
+            ErrorLog errorLog = new ErrorLog(new DateTime().toString(),schedulerName,notificationMessage.SCHEDULER_ERROR.getMessage(),e.getMessage(),equipmentName);
             errorLogRepository.save(errorLog);
             throw new JobExecutionException(e);
         }

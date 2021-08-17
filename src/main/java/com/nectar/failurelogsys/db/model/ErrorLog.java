@@ -10,6 +10,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "scheduler_failure_logs")
 public class ErrorLog {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
 
@@ -18,6 +19,9 @@ public class ErrorLog {
 
     @Column(name = "date")
     private String date;
+
+    @Column(name = "equipment_name")
+    private String equipmentName;
 
     @Column(name = "scheduler_name")
     private String schedulerName;
@@ -28,12 +32,13 @@ public class ErrorLog {
     @Column(name = "description")
     private String description;
 
-    public ErrorLog(String date, String schedulerName, String typeOfFailure, String description) {
+    public ErrorLog(String date, String schedulerName, String typeOfFailure, String description,String equipmentName) {
         super();
         this.date = date;
         this.schedulerName = schedulerName;
         this.typeOfFailure = typeOfFailure;
         this.description = description;
+        this.equipmentName = equipmentName;
     }
 
     public ErrorLog() {
@@ -50,6 +55,14 @@ public class ErrorLog {
 
     public String getDate() {
         return date;
+    }
+
+    public String getEquipmentName() {
+        return equipmentName;
+    }
+
+    public void setEquipmentName(String equipmentName) {
+        this.equipmentName = equipmentName;
     }
 
     public void setDate(String date) {
