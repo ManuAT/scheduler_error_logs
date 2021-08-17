@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Scanner;
 
 import com.nectar.failurelogsys.db.model.AggregationData;
@@ -87,52 +88,42 @@ public class jobObject extends QuartzJobBean{
                   log.warn(e.toString());
                 }
 
-            // getting data from History_db
-            List<HistoryData> historyDataList= (List<HistoryData>) historyDataRepository.selectFromHistoryData(startTime, endTime);
-            // System.out.println(historyDataList);
+            
 
             for(String equipmentName:equipmentList){
                 jobObject.equipmentName =equipmentName;
+
+
                 int count = 0;
-                int maxValue=0;
-                int minValue=0;
-                // HistoryData maxValue = new HistoryData();
-                // maxValue.setData("0");
-                // HistoryData minValue = new HistoryData();
-                // minValue.setData("0");
+               
 
-                
-                for(HistoryData data:historyDataList) {
-                    // System.out.println(data.getName()+equpmetList[i]);
-                    if(data.getName().equals(equipmentName)){
-                        count ++;
-                        if(count == 1){
-                            minValue = Integer.parseInt(data.getData());
-                            maxValue = Integer.parseInt(data.getData());
+                Double minimum =0.0;
+				Double maximum =0.0;
+
+                List<HistoryData> historyDataList =  historyDataRepository.selectFromHistoryData(startTime, endTime,equipmentName);
+
+                count = historyDataList.size();
+                System.out.println("Count :"+count);
+                Optional<HistoryData> minData = historyDataList.stream()
+						.min(Comparator.comparing(HistoryData::getData));
+
+                        if (minData.isPresent()) {
+                            minimum	= Double.parseDouble(minData.get().getData());
                         }
-                        else{
-                            maxValue = Integer.parseInt(data.getData());
+
+                Optional<HistoryData> maxData = historyDataList.stream()
+                    .max(Comparator.comparing(HistoryData::getData));
+
+                        if (maxData.isPresent()) {
+                            maximum	= Double.parseDouble(maxData.get().getData());
                         }
-                    }
-                }
 
-                // need to be checked
+ 
 
-                // maxValue = historyDataList.stream().max(Comparator.comparing(HistoryData::getData)).orElse(new HistoryData());
-                // minValue = historyDataList.stream().min(Comparator.comparing(HistoryData::getData)).orElse(new HistoryData());
-
-
-                // if(maxValue.getData() == null || minValue.getData() ==null){
-                //     maxValue.setData("0");
-                //     minValue.setData("0");
-                // }
-
-                // System.out.println("Printing Max value"+maxValue.getData()+minValue.getData());
-                System.out.println("Printing Max value"+maxValue+" "+minValue);
+                System.out.println("Printing Max value"+minimum+" "+maximum);
                     
                 if(count>1){
-                    // int aggregationDataFromHistory =Integer.parseInt(maxValue.getData())- Integer.parseInt(minValue.getData());
-                    int aggregationDataFromHistory = maxValue = minValue;
+                    double aggregationDataFromHistory = maximum - minimum;
 
 
 
@@ -144,7 +135,7 @@ public class jobObject extends QuartzJobBean{
                         
                     if(aggregationDataFromHistory < 5*Integer.parseInt(aggregationDataFromdb.getConsumption()) || Integer.parseInt(aggregationDataFromdb.getConsumption()) ==0 )
                     {
-                        AggregationData aggregationData = new AggregationData(equipmentName,startTime,Integer.toString(aggregationDataFromHistory));
+                        AggregationData aggregationData = new AggregationData(equipmentName,startTime,Double.toString(aggregationDataFromHistory));
                         // historyRepository.insertToAggregation(aggregationData);
                         aggregationDataRepository.save(aggregationData);
                         log.info("Aggregation Database updated");
