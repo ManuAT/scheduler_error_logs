@@ -1,35 +1,32 @@
-package com.nectar.failurelogsys.db.model;
+package com.nectar.failurelogsys.db.beans;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-// import java.sql.Date;
 @Entity
-@Table(name = "historydata")
-public class HistoryData {
+@Table(name = "aggregationdata")
+public class AggregationData {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    
     private Long id;
+    @Column(name = "name")
     private String name;
+    @Column(name = "datetime")
     private String datetime;
-    private String data;
+    @Column(name = "consumption")
+    private String consumption;
 
-    
-    public HistoryData() {
+    public AggregationData() {
         super();
     }
 
-
-    public HistoryData(String name, String datetime, String data) {
+    public AggregationData(String name, String datetime, String consumption) {
         super();
         this.name = name;
         this.datetime = datetime;
-        this.data = data;
+        this.consumption = consumption;
     }
 
     public Long getId() {
@@ -42,37 +39,31 @@ public class HistoryData {
         this.id = id;
     }
 
-
     public String getName() {
         return name;
     }
-
 
     public void setName(String name) {
         this.name = name;
     }
 
-
     public String getDatetime() {
         return datetime;
     }
-
 
     public void setDatetime(String datetime) {
         this.datetime = datetime;
     }
 
-
-    public String getData() {
-        return data;
+    public String getConsumption() {
+        return consumption;
     }
 
-
-    public void setData(String data) {
-        this.data = data;
+    public void setConsumption(String consumption) {
+        this.consumption = consumption;
     }
 
-
+    
     
     
 }

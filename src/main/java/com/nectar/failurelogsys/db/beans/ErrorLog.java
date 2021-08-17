@@ -1,4 +1,6 @@
-package com.nectar.failurelogsys.db.model;
+package com.nectar.failurelogsys.db.beans;
+
+import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,7 +19,7 @@ public class ErrorLog {
     private Long id;
 
     @Column(name = "date")
-    private String date;
+    private Timestamp date;
 
     @Column(name = "scheduler_name")
     private String schedulerName;
@@ -28,7 +30,7 @@ public class ErrorLog {
     @Column(name = "description")
     private String description;
 
-    public ErrorLog(String date, String schedulerName, String typeOfFailure, String description) {
+    public ErrorLog(Timestamp date, String schedulerName, String typeOfFailure, String description) {
         super();
         this.date = date;
         this.schedulerName = schedulerName;
@@ -48,15 +50,17 @@ public class ErrorLog {
         this.id = id;
     }
 
-    public String getDate() {
-        return date;
-    }
+   
 
-    public void setDate(String date) {
-        this.date = date;
-    }
+    public Timestamp getDate() {
+		return date;
+	}
 
-    public String getSchedulerName() {
+	public void setDate(Timestamp date) {
+		this.date = date;
+	}
+
+	public String getSchedulerName() {
         return schedulerName;
     }
 

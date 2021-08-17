@@ -1,190 +1,164 @@
 package com.nectar.failurelogsys;
 
 import java.io.File;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Scanner;
 
-import com.nectar.failurelogsys.db.model.AggregationData;
-import com.nectar.failurelogsys.db.model.ErrorLog;
-import com.nectar.failurelogsys.db.model.HistoryData;
-import com.nectar.failurelogsys.db.repository.AggregationDataRepository;
-import com.nectar.failurelogsys.db.repository.ErrorLogRepository;
-import com.nectar.failurelogsys.db.repository.HistoryDataRepository;
-// import com.nectar.failurelogsys.db.repository.HistoryRepository;
-import com.nectar.failurelogsys.service.EquipmentNotificationMessage;
-
 import org.joda.time.DateTime;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
+
+import com.nectar.failurelogsys.db.repository.AggregationRepository;
+import com.nectar.failurelogsys.db.repository.ErrorFinderRepository;
+import com.nectar.failurelogsys.db.repository.HistoryRepository;
+import com.nectar.failurelogsys.pojos.HistoryDataFetch;
+import com.nectar.failurelogsys.service.EquipmentNotificationMessage;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class jobObject extends QuartzJobBean{
+public class jobObject {
 
-    private EquipmentNotificationMessage notificationMessage;
-
+	private EquipmentNotificationMessage notificationMessage;
 
 	@Autowired
-	private HistoryDataRepository historyDataRepository;
+	private HistoryRepository historyDataRepository;
 
-    @Autowired
-	private AggregationDataRepository aggregationDataRepository;
+	@Autowired
+	private AggregationRepository aggregationDataRepository;
 
-    @Autowired
-	private ErrorLogRepository errorLogRepository;
+	@Autowired
+	private ErrorFinderRepository errorLogRepository;
 
-    // @Autowired
-	// private HistoryRepository historyRepository;
+	private static String schedulerName;
+	private static final Logger log = LoggerFactory.getLogger("jobObject");
 
-    private static String schedulerName;
-    private static final Logger log = LoggerFactory.getLogger("jobObject");
-    
-    @Override
-    protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        try {
-            // printing job Details
-            String id = jobExecutionContext.getJobDetail().getKey().getName();
-            schedulerName = id;
-            // System.out.println("Job Name :"+id+" executing");
-            log.info("Job Name :"+id+" executing");
+	public void getSchdulerFailureLogs() {
+		try {
 
+			// taking previous hour time stamps
 
-            // taking previous hour time stamps
-            String startTime,previousStartTime,endTime;
-            DateTime dateTime = new DateTime();
-            dateTime = dateTime.minusHours(1);
-            int currentHour = dateTime.getHourOfDay();
-            dateTime = dateTime.millisOfDay().withMinimumValue();
-            previousStartTime = dateTime.plusHours(currentHour-1).toString();
-            startTime = dateTime.plusHours(currentHour).toString();
-            endTime = dateTime.plusHours(currentHour+1).toString();
-            System.out.println("StartTime :"+startTime+"EndTime :"+endTime);
+			DateTime dateTime = new DateTime();
+			dateTime = dateTime.minusHours(1);
 
-            // List of equpment Name from file or Db
+			DateTime startProcessingTime = dateTime.withTime(dateTime.getHourOfDay(), 0, 0, 0);
+			DateTime endProcessingTime = dateTime.withTime(dateTime.getHourOfDay(), 59, 59, 999);
+			Timestamp startTime = new Timestamp(startProcessingTime.getMillis());
+			Timestamp endTime = new Timestamp(endProcessingTime.getMillis());
+			System.out.println("StartTime :" + startProcessingTime + "EndTime :" + endProcessingTime);
 
-            // String[] equpmetList={"Equip 1","Equip 2","Equip 3","Equip 4","Equip 6"};  
-            List<String> equipmentList = new ArrayList<String>();
+			// List of equpment Name from file or Db
 
-            try{
-                File file = new File("equipment.txt");
-                
-                Scanner sc = new Scanner(file);
-              
-                while (sc.hasNextLine())
-                  equipmentList.add(sc.nextLine());
-            
-                // for(String data:equipmentList)
-                //   log.info(data);
-                sc.close();
-                }catch(Exception e){
-                  log.warn(e.toString());
-                }
+			List<String> equipmentList = new ArrayList<String>();
 
-            // getting data from History_db
-            List<HistoryData> historyDataList= (List<HistoryData>) historyDataRepository.selectFromHistoryData(startTime, endTime);
-            // System.out.println(historyDataList);
+			try {
+				File file = new File("equipment.txt");
 
-            for(String equipmentName:equipmentList){
-                int count = 0;
-                // int maxValue=0;
-                // int minValue=0;
-                HistoryData maxValue;
-                HistoryData minValue;
+				Scanner sc = new Scanner(file);
 
-                
-                // for(HistoryData data:historyDataList) {
-                //     // System.out.println(data.getName()+equpmetList[i]);
-                //     if(data.getName().equals(equipmentName)){
-                //         count ++;
-                //         if(count == 1){
-                //             minValue = Integer.parseInt(data.getData());
-                //             maxValue = Integer.parseInt(data.getData());
-                //         }
-                //         else{
-                //             maxValue = Integer.parseInt(data.getData());
-                //         }
-                //     }
-                // }
+				while (sc.hasNextLine())
+					equipmentList.add(sc.nextLine());
 
-                // need to be checked
+				sc.close();
+			} catch (Exception e) {
+				log.error(e.toString());
+			}
 
-                maxValue = historyDataList.stream().max(Comparator.comparing(HistoryData::getData)).orElse(new HistoryData());
-                minValue = historyDataList.stream().min(Comparator.comparing(HistoryData::getData)).orElse(new HistoryData());
+			
+			// System.out.println(historyDataList);
 
-                System.out.println("Printing Max value"+maxValue.getData());
+			for (String equip : equipmentList) {
+				int count = 0;
+				// getting data from History_db
+				Double minimum =0.0;
+				Double maximum =0.0;
+				List<HistoryDataFetch> historyDataList = historyDataRepository
+						.findHistoryData(equip,startTime, endTime);
+			
 
-                if(maxValue.getData() == null || minValue.getData() ==null){
-                    maxValue.setData("0");
-                    minValue.setData("0");
-                }
-                    
-                if(count>1){
-                    int aggregationDataFromHistory =Integer.parseInt(maxValue.getData())- Integer.parseInt(minValue.getData());
-                    // int aggregationDataFromHistory = maxValue = minValue;
+				Optional<HistoryDataFetch> minData = historyDataList.stream()
+						.min(Comparator.comparing(HistoryDataFetch::getData));
+				if (minData.isPresent()) {
+					minimum	= minData.get().getData();
 
+				}
+			
+				Optional<HistoryDataFetch> maxData = historyDataList.stream()
+						.min(Comparator.comparing(HistoryDataFetch::getData));
+				if (maxData.isPresent()) {
+					maximum	= minData.get().getData();
 
+				}
+			
 
-                    AggregationData aggregationDataFromdb = (AggregationData) aggregationDataRepository.selectFromAggregationData(previousStartTime, equipmentName);//[0]
-                    
-                    if(aggregationDataFromHistory < 5*Integer.parseInt(aggregationDataFromdb.getConsumption()) || Integer.parseInt(aggregationDataFromdb.getConsumption()) ==0 )
-                    {
-                        AggregationData aggregationData = new AggregationData(equipmentName,startTime,Integer.toString(aggregationDataFromHistory));
-                        // historyRepository.insertToAggregation(aggregationData);
-                        aggregationDataRepository.save(aggregationData);
-                        log.info("Aggregation Database updated");
-                    }
-                    else
-                    {
-                        AggregationData aggregationData = new AggregationData(equipmentName,startTime,"0");
-                        aggregationDataRepository.save(aggregationData);
-                        log.warn("Aggregation Database updated with spike");
+//				if (count > 1) {
+//					int aggregationDataFromHistory = Integer.parseInt(maxValue.getData())
+//							- Integer.parseInt(minValue.getData());
+//					// int aggregationDataFromHistory = maxValue = minValue;
+//
+//					AggregationData aggregationDataFromdb = (AggregationData) aggregationDataRepository
+//							.selectFromAggregationData(previousStartTime, equipmentName);// [0]
+//
+//					if (aggregationDataFromHistory < 5 * Integer.parseInt(aggregationDataFromdb.getConsumption())
+//							|| Integer.parseInt(aggregationDataFromdb.getConsumption()) == 0) {
+//						AggregationData aggregationData = new AggregationData(equipmentName, startTime,
+//								Integer.toString(aggregationDataFromHistory));
+//						// historyRepository.insertToAggregation(aggregationData);
+//						aggregationDataRepository.save(aggregationData);
+//						log.info("Aggregation Database updated");
+//					} else {
+//						AggregationData aggregationData = new AggregationData(equipmentName, startTime, "0");
+//						aggregationDataRepository.save(aggregationData);
+//						log.warn("Aggregation Database updated with spike");
+//
+//						ErrorLog errorLog = new ErrorLog(new DateTime().toString(), id,
+//								notificationMessage.SPIKE.getMessage(), notificationMessage.SPIKE.getDescription());
+//						errorLogRepository.save(errorLog);
+//						log.warn("Equipment :" + equipmentName + " failed and err_databse database updated");
+//
+//					}
+//				} else if (count == 1) {
+//					AggregationData aggregationData = new AggregationData(equipmentName, startTime, "0");
+//					aggregationDataRepository.save(aggregationData);
+//					log.warn("Equipment :" + equipmentName + "might lost Conection and databse updated");
+//
+//					ErrorLog errorLog = new ErrorLog(new DateTime().toString(), id,
+//							notificationMessage.NON_CUMULATIVE.getMessage(),
+//							notificationMessage.NON_CUMULATIVE.getDescription());
+//					errorLogRepository.save(errorLog);
+//					log.warn("Equipment :" + equipmentName + " failed and err_databse database updated");
+//
+//				} else {
+//					AggregationData aggregationData = new AggregationData(equipmentName, startTime, "0");
+//					aggregationDataRepository.save(aggregationData);
+//					log.warn("Equipment :" + equipmentName + " failed and aggregation database updated");
+//
+//					ErrorLog errorLog = new ErrorLog(new DateTime().toString(), id,
+//							notificationMessage.NO_COMMUNICATION.getMessage(),
+//							notificationMessage.NO_COMMUNICATION.getDescription());
+//					errorLogRepository.save(errorLog);
+//					log.warn("Equipment :" + equipmentName + " failed and err_databse database updated");
+//
+//				}
 
-                        ErrorLog errorLog = new ErrorLog(new DateTime().toString(),id,notificationMessage.SPIKE.getMessage(),notificationMessage.SPIKE.getDescription());
-                        errorLogRepository.save(errorLog);
-                        log.warn("Equipment :"+equipmentName+" failed and err_databse database updated");
+			}
 
+		} catch (Exception e) {
 
-                    }
-                }
-                else if(count==1){
-                        AggregationData aggregationData = new AggregationData(equipmentName,startTime,"0");
-                        aggregationDataRepository.save(aggregationData);
-                        log.warn("Equipment :"+equipmentName+"might lost Conection and databse updated");
+			log.error("Error occured at scheduler and reporting :" + e.getMessage());
+//			ErrorLog errorLog = new ErrorLog(new DateTime().toString(), schedulerName,
+//					notificationMessage.SCHEDULER_ERROR.getMessage(), e.getMessage());
+//			errorLogRepository.save(errorLog);
+//			throw new JobExecutionException(e);
+		}
 
-                        ErrorLog errorLog = new ErrorLog(new DateTime().toString(),id,notificationMessage.NON_CUMULATIVE.getMessage(),notificationMessage.NON_CUMULATIVE.getDescription());
-                        errorLogRepository.save(errorLog);
-                        log.warn("Equipment :"+equipmentName+" failed and err_databse database updated");
+	}
 
-                }else{
-                    AggregationData aggregationData = new AggregationData(equipmentName,startTime,"0");
-                    aggregationDataRepository.save(aggregationData);
-                    log.warn("Equipment :"+equipmentName+" failed and aggregation database updated");
-
-                    ErrorLog errorLog = new ErrorLog(new DateTime().toString(),id,notificationMessage.NO_COMMUNICATION.getMessage(),notificationMessage.NO_COMMUNICATION.getDescription());
-                    errorLogRepository.save(errorLog);
-                    log.warn("Equipment :"+equipmentName+" failed and err_databse database updated");
-
-                }
-
-            }
-
-        } catch (Exception e) {
-
-            log.error("Error occured at scheduler and reporting :"+e.getMessage());
-            ErrorLog errorLog = new ErrorLog(new DateTime().toString(),schedulerName,notificationMessage.SCHEDULER_ERROR.getMessage(),e.getMessage());
-            errorLogRepository.save(errorLog);
-            throw new JobExecutionException(e);
-        }
-        
-    }
-    
 }
