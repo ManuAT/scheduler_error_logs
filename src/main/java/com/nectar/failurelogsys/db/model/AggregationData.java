@@ -1,5 +1,8 @@
 package com.nectar.failurelogsys.db.model;
 
+import java.sql.Timestamp;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -12,17 +15,24 @@ public class AggregationData {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-
+    
+    @Column(name = "id")
     private Long id;
+
+    @Column(name = "name")
     private String name;
-    private String datetime;
-    private String consumption;
+
+    @Column(name = "datetime")
+    private Timestamp datetime;
+
+    @Column(name = "consumption")
+    private Double consumption;
 
     public AggregationData() {
         super();
     }
 
-    public AggregationData(String name, String datetime, String consumption) {
+    public AggregationData(String name, Timestamp datetime, Double consumption) {
         super();
         this.name = name;
         this.datetime = datetime;
@@ -47,19 +57,19 @@ public class AggregationData {
         this.name = name;
     }
 
-    public String getDatetime() {
+    public Timestamp getDatetime() {
         return datetime;
     }
 
-    public void setDatetime(String datetime) {
+    public void setDatetime(Timestamp datetime) {
         this.datetime = datetime;
     }
 
-    public String getConsumption() {
+    public Double getConsumption() {
         return consumption;
     }
 
-    public void setConsumption(String consumption) {
+    public void setConsumption(Double consumption) {
         this.consumption = consumption;
     }
 

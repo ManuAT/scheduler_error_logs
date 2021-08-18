@@ -1,5 +1,8 @@
 package com.nectar.failurelogsys.db.model;
 
+import java.sql.Timestamp;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,10 +17,17 @@ public class HistoryData {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     
+    @Column(name = "id")
     private Long id;
+
+    @Column(name = "name")
     private String name;
-    private String datetime;
-    private String data;
+
+    @Column(name = "datetime")
+    private Timestamp datetime;
+
+    @Column(name = "data")
+    private Double data;
 
     
     public HistoryData() {
@@ -25,7 +35,7 @@ public class HistoryData {
     }
 
 
-    public HistoryData(String name, String datetime, String data) {
+    public HistoryData(String name, Timestamp datetime, Double data) {
         super();
         this.name = name;
         this.datetime = datetime;
@@ -53,22 +63,22 @@ public class HistoryData {
     }
 
 
-    public String getDatetime() {
+    public Timestamp getDatetime() {
         return datetime;
     }
 
 
-    public void setDatetime(String datetime) {
+    public void setDatetime(Timestamp datetime) {
         this.datetime = datetime;
     }
 
 
-    public String getData() {
+    public Double getData() {
         return data;
     }
 
 
-    public void setData(String data) {
+    public void setData(Double data) {
         this.data = data;
     }
 
