@@ -9,7 +9,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-// import java.sql.Date;
 @Entity
 @Table(name = "historydata")
 public class HistoryData {

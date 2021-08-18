@@ -42,8 +42,6 @@ public class jobObject extends QuartzJobBean{
     @Autowired
 	private ErrorLogRepository errorLogRepository;
 
-    // @Autowired
-	// private HistoryRepository historyRepository;
 
     private static String schedulerName;
     private static String equipmentName;
@@ -55,7 +53,6 @@ public class jobObject extends QuartzJobBean{
             // printing job Details
             String id = jobExecutionContext.getJobDetail().getKey().getName();
             schedulerName = id;
-            // System.out.println("Job Name :"+id+" executing");
             log.info("Job Name :"+id+" executing");
 
 
@@ -71,8 +68,6 @@ public class jobObject extends QuartzJobBean{
             System.out.println("StartTime :"+startTime+"EndTime :"+endTime);
 
             // List of equpment Name from file or Db
-
-            // String[] equpmetList={"Equip 1","Equip 2","Equip 3","Equip 4","Equip 6"};  
             List<String> equipmentList = new ArrayList<String>();
 
             try{
@@ -136,7 +131,6 @@ public class jobObject extends QuartzJobBean{
                     if(aggregationDataFromHistory < 5*aggregationDataFromdb.getConsumption() || aggregationDataFromdb.getConsumption() ==0.0 )
                     {
                         AggregationData aggregationData = new AggregationData(equipmentName,startTime,aggregationDataFromHistory);
-                        // historyRepository.insertToAggregation(aggregationData);
                         aggregationDataRepository.save(aggregationData);
                         log.info("Aggregation Database updated");
                     }

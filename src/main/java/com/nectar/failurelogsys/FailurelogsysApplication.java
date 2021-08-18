@@ -33,10 +33,9 @@ public class FailurelogsysApplication implements CommandLineRunner{
 	public void run(String... args) throws Exception {
 
 		// ============ job creation and delete =================
+		
+		// NOTE: need to command this code after first creation  for testing it uses 10s trigger
 
-		// NOTE: need to command this code after first creation 
-
-		// for testinf it uses 10s trigger
 
 		// HashMap<String, Object> data = new HashMap<String, Object>();
 		// data.put("domain", "nectar");
@@ -44,8 +43,7 @@ public class FailurelogsysApplication implements CommandLineRunner{
 		// 			jobObject.class);
 
 		
-		//NOTE to delete scheduler 
-
+		//NOTE ==========to delete scheduler ========
 		// taskScheduler.deleteScheduledTask(AGGREGRATION_JOB, AGGREGRATION_JOB);
 	
 	}
