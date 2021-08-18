@@ -34,13 +34,17 @@ public class ErrorLog {
     @Column(name = "description")
     private String description;
 
-    public ErrorLog(Timestamp date, String schedulerName, String typeOfFailure, String description,String equipmentName) {
+    @Column(name = "client")
+    private String client;
+
+    public ErrorLog(Timestamp date, String schedulerName, String typeOfFailure, String description,String equipmentName,String client) {
         super();
         this.date = date;
         this.schedulerName = schedulerName;
         this.typeOfFailure = typeOfFailure;
         this.description = description;
         this.equipmentName = equipmentName;
+        this.client= client;
     }
 
     public ErrorLog() {
@@ -65,6 +69,14 @@ public class ErrorLog {
 
     public void setEquipmentName(String equipmentName) {
         this.equipmentName = equipmentName;
+    }
+
+    public String getClient() {
+        return client;
+    }
+
+    public void setClient(String client) {
+        this.client = client;
     }
 
     public void setDate(Timestamp date) {

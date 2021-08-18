@@ -118,6 +118,8 @@ public class jobObject extends QuartzJobBean{
                 System.out.println("Printing Max value"+minimum+" "+maximum);
                     
                 if(count>1){
+                   
+
                     double aggregationDataFromHistory = maximum - minimum;
 
 
@@ -127,8 +129,19 @@ public class jobObject extends QuartzJobBean{
                         aggregationDataFromdb = new AggregationData();
                         aggregationDataFromdb.setConsumption(0.0);
                     }
+                    // historyDataList.stream().map(HistoryData::getData).distinct().limit(2).count() <= 1
+                    if(aggregationDataFromHistory == 0.0){
+
+                        AggregationData aggregationData = new AggregationData(equipmentName,startTime,0.0);
+                        aggregationDataRepository.save(aggregationData);
+                        log.warn("Aggregation Database updated with isssue of static data.");
+
+                        ErrorLog errorLog = new ErrorLog(startTime,id,notificationMessage.STATIC.getMessage(),notificationMessage.STATIC.getDescription(),equipmentName,"nectar");
+                        errorLogRepository.save(errorLog);
+                        log.warn("Equipment :"+equipmentName+" failed due to Static Data and err_databse database updated.");
                         
-                    if(aggregationDataFromHistory < 5*aggregationDataFromdb.getConsumption() || aggregationDataFromdb.getConsumption() ==0.0 )
+                    }    
+                    else if(aggregationDataFromHistory < 5*aggregationDataFromdb.getConsumption() || aggregationDataFromdb.getConsumption() ==0.0 )
                     {
                         AggregationData aggregationData = new AggregationData(equipmentName,startTime,aggregationDataFromHistory);
                         aggregationDataRepository.save(aggregationData);
@@ -140,9 +153,9 @@ public class jobObject extends QuartzJobBean{
                         aggregationDataRepository.save(aggregationData);
                         log.warn("Aggregation Database updated with spike");
 
-                        ErrorLog errorLog = new ErrorLog(new Timestamp(new DateTime().getMillis()),id,notificationMessage.SPIKE.getMessage(),notificationMessage.SPIKE.getDescription(),equipmentName);
+                        ErrorLog errorLog = new ErrorLog(startTime,id,notificationMessage.SPIKE.getMessage(),notificationMessage.SPIKE.getDescription(),equipmentName,"nectar");
                         errorLogRepository.save(errorLog);
-                        log.warn("Equipment :"+equipmentName+" failed and err_databse database updated");
+                        log.warn("Equipment :"+equipmentName+" failed due to spike and err_databse database updated");
 
 
                     }
@@ -152,7 +165,7 @@ public class jobObject extends QuartzJobBean{
                         aggregationDataRepository.save(aggregationData);
                         log.warn("Equipment :"+equipmentName+"might lost Conection and databse updated");
 
-                        ErrorLog errorLog = new ErrorLog(new Timestamp(new DateTime().getMillis()),id,notificationMessage.NON_CUMULATIVE.getMessage(),notificationMessage.NON_CUMULATIVE.getDescription(),equipmentName);
+                        ErrorLog errorLog = new ErrorLog(startTime,id,notificationMessage.NON_CUMULATIVE.getMessage(),notificationMessage.NON_CUMULATIVE.getDescription(),equipmentName,"nectar");
                         errorLogRepository.save(errorLog);
                         log.warn("Equipment :"+equipmentName+" failed and err_databse database updated");
 
@@ -161,7 +174,7 @@ public class jobObject extends QuartzJobBean{
                     aggregationDataRepository.save(aggregationData);
                     log.warn("Equipment :"+equipmentName+" failed and aggregation database updated");
 
-                    ErrorLog errorLog = new ErrorLog(new Timestamp(new DateTime().getMillis()),id,notificationMessage.NO_COMMUNICATION.getMessage(),notificationMessage.NO_COMMUNICATION.getDescription(),equipmentName);
+                    ErrorLog errorLog = new ErrorLog(startTime,id,notificationMessage.NO_COMMUNICATION.getMessage(),notificationMessage.NO_COMMUNICATION.getDescription(),equipmentName,"nectar");
                     errorLogRepository.save(errorLog);
                     log.warn("Equipment :"+equipmentName+" failed and err_databse database updated");
 
@@ -172,7 +185,7 @@ public class jobObject extends QuartzJobBean{
         } catch (Exception e) {
 
             log.error("Error occured at scheduler and reporting :"+e.getMessage());
-            ErrorLog errorLog = new ErrorLog(new Timestamp(new DateTime().getMillis()),schedulerName,notificationMessage.SCHEDULER_ERROR.getMessage(),e.getMessage(),equipmentName);
+            ErrorLog errorLog = new ErrorLog(new Timestamp(new DateTime().getMillis()),schedulerName,notificationMessage.SCHEDULER_ERROR.getMessage(),e.getMessage(),equipmentName,"nectar");
             errorLogRepository.save(errorLog);
             throw new JobExecutionException(e);
         }
