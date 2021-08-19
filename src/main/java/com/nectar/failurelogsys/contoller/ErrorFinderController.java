@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import com.nectar.failurelogsys.db.model.ErrorArray;
@@ -13,6 +15,7 @@ import com.nectar.failurelogsys.db.model.InputData;
 import com.nectar.failurelogsys.db.model.OutputData;
 import com.nectar.failurelogsys.db.repository.ErrorLogRepository;
 
+import org.hibernate.result.Output;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,45 +33,17 @@ public class ErrorFinderController {
 
             List<OutputData> OutputDataList = new ArrayList<OutputData>();
 
+            List<ErrorLog> resultList = new ArrayList<ErrorLog>();
 
+            if(inputData.getEquipments().size() != 0)
+                resultList = errorLogRepository.selectFromErrorLogData(new Timestamp(inputData.getStartDate()),new Timestamp(inputData.getEndDate()),inputData.getClient(), inputData.getEquipments());
+            else
+                resultList = errorLogRepository.selectFromErrorLogDataWithDomain(new Timestamp(inputData.getStartDate()),new Timestamp(inputData.getEndDate()),inputData.getClient());
 
-            if(inputData.getEquipments().size() != 0){
+            Map<String, List<ErrorLog>> resultGrouped = resultList.stream().collect(Collectors.groupingBy(w -> w.getEquipmentName()));
 
-                List<ErrorLog> resultList = errorLogRepository.selectFromErrorLogData(new Timestamp(inputData.getStartDate()),new Timestamp(inputData.getEndDate()),
-                                                    inputData.getClient(), inputData.getEquipments());
-
-                for(String equip:inputData.getEquipments())
-                {
-                    List<ErrorArray> errorArraysList =  resultList.stream()
-                            .filter(p -> p.getEquipmentName().equals(equip))
-                            .map(p -> new ErrorArray(p.getDate().getTime(), p.getTypeOfFailure(),p.getDescription()))
-                            .collect(Collectors.toList());
-  
-                    OutputDataList.add(new OutputData(equip,errorArraysList));
-
-                }
-
-           
-            }
-            else{
+            OutputDataList = resultGrouped.keySet().stream().sorted().map(p-> new OutputData(p,resultGrouped.get(p).stream().map(m-> new ErrorArray(m.getDate().getTime(), m.getTypeOfFailure(),m.getDescription())).collect(Collectors.toList()))).collect(Collectors.toList());
         
-            List<ErrorLog> resultList = errorLogRepository.selectFromErrorLogDataWithDomain(new Timestamp(inputData.getStartDate()),new Timestamp(inputData.getEndDate()),
-                                                         inputData.getClient());
-                                                         
-            List<String> uniqueEquipment = resultList.stream().map(ErrorLog::getEquipmentName).distinct().collect(Collectors.toList());
-
-            for(String equip:uniqueEquipment)
-            {
-                List<ErrorArray> errorArraysList =  resultList.stream()
-                    .filter(p -> p.getEquipmentName().equals(equip))
-                    .map(p -> new ErrorArray(p.getDate().getTime(), p.getTypeOfFailure(),p.getDescription()))
-                    .collect(Collectors.toList());
-
-                OutputDataList.add(new OutputData(equip,errorArraysList));
-            }
-            
-            }
-
         return OutputDataList;
         
     }
