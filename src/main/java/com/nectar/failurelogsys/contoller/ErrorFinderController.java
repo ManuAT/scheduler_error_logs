@@ -27,15 +27,14 @@ public class ErrorFinderController {
     ErrorLogRepository errorLogRepository;
 
     @GetMapping("/equip")
-    public OutputData[]  getErrors(@RequestBody InputData inputData) {
+    public List<OutputData>  getErrors(@RequestBody InputData inputData) {
 
 
             List<OutputData> OutputDataList = new ArrayList<OutputData>();
 
 
-            // errorArraysList.clear();
 
-            if(inputData.getEquipments().length != 0){
+            if(inputData.getEquipments().size() != 0){
 
                 List<ErrorLog> resultList = errorLogRepository.selectFromErrorLogData(new Timestamp(inputData.getStartDate()),new Timestamp(inputData.getEndDate()),
                                                     inputData.getClient(), inputData.getEquipments());
@@ -51,8 +50,8 @@ public class ErrorFinderController {
                     for(ErrorLog result: resultListUniqe){
                         errorArraysList.add(new ErrorArray(result.getDate().getTime(),result.getTypeOfFailure(),result.getDescription()));
                     }
-                    ErrorArray[] errArray = errorArraysList.stream().toArray(ErrorArray[] ::new);
-                    OutputDataList.add(new OutputData(equip,errArray));
+                    
+                    OutputDataList.add(new OutputData(equip,errorArraysList));
 
                 }
 
@@ -77,18 +76,13 @@ public class ErrorFinderController {
                 }
 
 
-                ErrorArray[] errArray = errorArraysList.stream().toArray(ErrorArray[] ::new);
-                OutputDataList.add(new OutputData(equip,errArray));
+                OutputDataList.add(new OutputData(equip,errorArraysList));
 
             }
             
             }
 
-
-
-        OutputData[] outPutArray = OutputDataList.stream().toArray(OutputData[] ::new);
-        
-        return outPutArray;
+        return OutputDataList;
         
     }
 

@@ -1,11 +1,13 @@
 package com.nectar.failurelogsys.db.model;
 
+import java.util.List;
+
 public class InputData {
 
     long startDate;
     long endDate;
     String client;
-    String[] equipments;
+    List<String> equipments;
 
 
     public InputData() {
@@ -13,7 +15,7 @@ public class InputData {
     }
 
 
-    public InputData(long startDate, long endDate, String client, String[] equipments) {
+    public InputData(long startDate, long endDate, String client, List<String> equipments) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.client = client;
@@ -51,12 +53,12 @@ public class InputData {
     }
 
 
-    public String[] getEquipments() {
+    public List<String> getEquipments() {
         return equipments;
     }
 
 
-    public void setEquipments(String[] equipments) {
+    public void setEquipments(List<String> equipments) {
         this.equipments = equipments;
     }
 

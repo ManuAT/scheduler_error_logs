@@ -1,16 +1,17 @@
 package com.nectar.failurelogsys.db.model;
 
+import java.util.List;
 
 public class OutputData {
 
     String equip;
-    ErrorArray[] errors;
+    List<ErrorArray> errors;
 
     public OutputData() {
         super();
     }
 
-    public OutputData(String equip, ErrorArray[] errors) {
+    public OutputData(String equip, List<ErrorArray> errors) {
         this.equip = equip;
         this.errors = errors;
     }
@@ -23,11 +24,11 @@ public class OutputData {
         this.equip = equip;
     }
 
-    public ErrorArray[] getErrors() {
+    public List<ErrorArray> getErrors() {
         return errors;
     }
 
-    public void setErrors(ErrorArray[] errors) {
+    public void setErrors(List<ErrorArray> errors) {
         this.errors = errors;
     }
 

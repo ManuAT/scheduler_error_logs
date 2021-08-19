@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 public interface ErrorLogRepository extends JpaRepository<ErrorLog,Long>{
 
     @Query(value = "SELECT * FROM scheduler_failure_logs u WHERE u.equipment_name in ?4 AND u.client=?3 AND u.date >= ?1 AND u.date < ?2", nativeQuery = true)
-    List<ErrorLog> selectFromErrorLogData(Timestamp startDate, Timestamp endDate,String client,String[] equipmentName);
+    List<ErrorLog> selectFromErrorLogData(Timestamp startDate, Timestamp endDate,String client,List<String> equipmentName);
 
     @Query(value = "SELECT * FROM scheduler_failure_logs u WHERE u.client=?3 AND u.date >= ?1 AND u.date < ?2", nativeQuery = true)
     List<ErrorLog> selectFromErrorLogDataWithDomain(Timestamp startDate,Timestamp endDate,String client);
