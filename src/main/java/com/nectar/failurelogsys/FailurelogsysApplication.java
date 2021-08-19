@@ -39,7 +39,7 @@ public class FailurelogsysApplication implements CommandLineRunner{
 		// HashMap<String, Object> data = new HashMap<String, Object>();
 		// data.put("domain", "nectar");
 		// taskScheduler.createCroneJob(AGGREGRATION_JOB, AGGREGRATION_JOB, data, EVERY_HOUR,
-		// 			jobObject.class);
+		// 			SchedulerErrorProcessor.class);
 
 		//NOTE ==========to delete scheduler ========
 		// taskScheduler.deleteScheduledTask(AGGREGRATION_JOB, AGGREGRATION_JOB);

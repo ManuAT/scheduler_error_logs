@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class jobObject extends QuartzJobBean{
+public class SchedulerErrorProcessor extends QuartzJobBean{
 
     private EquipmentNotificationMessage notificationMessage;
 
@@ -45,7 +45,7 @@ public class jobObject extends QuartzJobBean{
 
     private static String schedulerName;
     private static String equipmentName;
-    private static final Logger log = LoggerFactory.getLogger("jobObject");
+    private static final Logger log = LoggerFactory.getLogger("SchedulerErrorProcessor");
     
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
@@ -86,7 +86,7 @@ public class jobObject extends QuartzJobBean{
             
 
             for(String equipmentName:equipmentList){
-                jobObject.equipmentName =equipmentName;
+                SchedulerErrorProcessor.equipmentName =equipmentName;
 
 
                 int count = 0;
