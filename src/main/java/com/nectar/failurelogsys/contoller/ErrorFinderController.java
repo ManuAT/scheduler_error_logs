@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.nectar.failurelogsys.db.model.ErrorArray;
 import com.nectar.failurelogsys.db.model.ErrorLog;
@@ -23,32 +25,70 @@ public class ErrorFinderController {
     @Autowired
     ErrorLogRepository errorLogRepository;
 
-    @GetMapping("/")
-    public OutputData[] getErrors(@RequestBody InputData inputData) {
+    @GetMapping("/equip")
+    public OutputData[]  getErrors(@RequestBody InputData inputData) {
 
-        List<ErrorArray> errorArraysList = new ArrayList<ErrorArray>();
 
-        List<OutputData> OutputDataList = new ArrayList<OutputData>();
+            List<OutputData> OutputDataList = new ArrayList<OutputData>();
 
-        for(String equip:inputData.getEquipments()){
 
-            errorArraysList.clear();
+            // errorArraysList.clear();
 
-            List<ErrorLog> resultList = errorLogRepository.selectFromErrorLogData(new Timestamp(inputData.getStartDate()),new Timestamp(inputData.getEndDate()),
-                                                 inputData.getClient(), equip);
-            // this loop will be removed ..
-            for(ErrorLog result: resultList){
-                errorArraysList.add(new ErrorArray(result.getDate().getTime(),result.getTypeOfFailure(),result.getDescription()));
+            if(inputData.getEquipments().length != 0){
+
+                List<ErrorLog> resultList = errorLogRepository.selectFromErrorLogData(new Timestamp(inputData.getStartDate()),new Timestamp(inputData.getEndDate()),
+                                                    inputData.getClient(), inputData.getEquipments());
+
+                
+                for(String equip:inputData.getEquipments())
+                {
+                    List<ErrorArray> errorArraysList = new ArrayList<ErrorArray>();
+
+                    List<ErrorLog> resultList2 =  resultList.stream().filter(p -> p.getEquipmentName().equals(equip)).collect(Collectors.toList());
+                
+                    // this loop will be removed ..
+                    for(ErrorLog result: resultList2){
+                        errorArraysList.add(new ErrorArray(result.getDate().getTime(),result.getTypeOfFailure(),result.getDescription()));
+                    }
+                    ErrorArray[] errArray = errorArraysList.stream().toArray(ErrorArray[] ::new);
+                    OutputDataList.add(new OutputData(equip,errArray));
+
+                }
+
+           
+            }
+            else{
+        
+            List<ErrorLog> resultList = errorLogRepository.selectFromErrorLogDataWithDomain(new Timestamp(inputData.getStartDate()),new Timestamp(inputData.getEndDate()),
+                                                         inputData.getClient());
+                                                         
+            List<String> uniqueEquipment = resultList.stream().map(ErrorLog::getEquipmentName).distinct().collect(Collectors.toList());
+
+            for(String equip:uniqueEquipment)
+            {
+                List<ErrorArray> errorArraysList = new ArrayList<ErrorArray>();
+
+                List<ErrorLog> resultList2 =  resultList.stream().filter(p -> p.getEquipmentName().equals(equip)).collect(Collectors.toList());
+            
+                // this loop will be removed ..
+                for(ErrorLog result: resultList2){
+                    errorArraysList.add(new ErrorArray(result.getDate().getTime(),result.getTypeOfFailure(),result.getDescription()));
+                }
+                ErrorArray[] errArray = errorArraysList.stream().toArray(ErrorArray[] ::new);
+                OutputDataList.add(new OutputData(equip,errArray));
+
+            }
+            
             }
 
-            ErrorArray[] errArray = errorArraysList.stream().toArray(ErrorArray[] ::new);
-            OutputDataList.add(new OutputData(equip,errArray));
-        }
+
 
         OutputData[] outPutArray = OutputDataList.stream().toArray(OutputData[] ::new);
         
         return outPutArray;
         
     }
+
+    
     
 }
