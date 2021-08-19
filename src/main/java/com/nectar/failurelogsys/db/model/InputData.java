@@ -4,10 +4,10 @@ import java.util.List;
 
 public class InputData {
 
-    long startDate;
-    long endDate;
-    String client;
-    List<String> equipments;
+    private long startDate;
+    private long endDate;
+    private String client;
+    private List<String> equipments;
 
 
     public InputData() {

@@ -4,8 +4,8 @@ import java.util.List;
 
 public class OutputData {
 
-    String equip;
-    List<ErrorArray> errors;
+    private String equip;
+    private List<ErrorArray> errors;
 
     public OutputData() {
         super();

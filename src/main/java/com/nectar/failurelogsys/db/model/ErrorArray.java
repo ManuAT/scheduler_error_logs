@@ -2,9 +2,9 @@ package com.nectar.failurelogsys.db.model;
 
 public class ErrorArray {
 
-    long date;
-    String error;
-    String description;
+    private long date;
+    private String error;
+    private String description;
 
     public ErrorArray() {
         super();
