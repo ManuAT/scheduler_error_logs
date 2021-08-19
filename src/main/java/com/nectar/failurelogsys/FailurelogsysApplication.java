@@ -36,10 +36,10 @@ public class FailurelogsysApplication implements CommandLineRunner{
 		
 		// NOTE: need to command this code after first creation  for testing it uses 10s trigger
 
-		// HashMap<String, Object> data = new HashMap<String, Object>();
-		// data.put("domain", "nectar");
-		// taskScheduler.createCroneJob(AGGREGRATION_JOB, AGGREGRATION_JOB, data, EVERY_HOUR,
-		// 			SchedulerErrorProcessor.class);
+		HashMap<String, Object> data = new HashMap<String, Object>();
+		data.put("domain", "nectar");
+		taskScheduler.createCroneJob(AGGREGRATION_JOB, AGGREGRATION_JOB, data, EVERY_HOUR,
+					SchedulerErrorProcessor.class);
 
 		//NOTE ==========to delete scheduler ========
 		// taskScheduler.deleteScheduledTask(AGGREGRATION_JOB, AGGREGRATION_JOB);
