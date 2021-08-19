@@ -14,6 +14,7 @@ import com.nectar.failurelogsys.db.model.InputData;
 import com.nectar.failurelogsys.db.model.OutputData;
 import com.nectar.failurelogsys.db.repository.ErrorLogRepository;
 
+import org.hibernate.result.Output;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,15 +40,15 @@ public class ErrorFinderController {
                 List<ErrorLog> resultList = errorLogRepository.selectFromErrorLogData(new Timestamp(inputData.getStartDate()),new Timestamp(inputData.getEndDate()),
                                                     inputData.getClient(), inputData.getEquipments());
 
-                
+                  
                 for(String equip:inputData.getEquipments())
                 {
                     List<ErrorArray> errorArraysList = new ArrayList<ErrorArray>();
 
-                    List<ErrorLog> resultList2 =  resultList.stream().filter(p -> p.getEquipmentName().equals(equip)).collect(Collectors.toList());
+                    List<ErrorLog> resultListUniqe =  resultList.stream().filter(p -> p.getEquipmentName().equals(equip)).collect(Collectors.toList());
                 
                     // this loop will be removed ..
-                    for(ErrorLog result: resultList2){
+                    for(ErrorLog result: resultListUniqe){
                         errorArraysList.add(new ErrorArray(result.getDate().getTime(),result.getTypeOfFailure(),result.getDescription()));
                     }
                     ErrorArray[] errArray = errorArraysList.stream().toArray(ErrorArray[] ::new);
@@ -74,6 +75,8 @@ public class ErrorFinderController {
                 for(ErrorLog result: resultList2){
                     errorArraysList.add(new ErrorArray(result.getDate().getTime(),result.getTypeOfFailure(),result.getDescription()));
                 }
+
+
                 ErrorArray[] errArray = errorArraysList.stream().toArray(ErrorArray[] ::new);
                 OutputDataList.add(new OutputData(equip,errArray));
 
